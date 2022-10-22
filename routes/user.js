@@ -7,6 +7,12 @@ const userHelpers = require('../helpers/user-helpers')
 let pop = {}
 let popupstatus, user, admin, usermail, signuppop
 
+
+adminuser = "mvfawazmfz@gmail.com"
+
+
+//-----------middlewears-------//
+
 sessioncheck = (req, res, next) => {
     if (req.session.log) {
         res.redirect('/')
@@ -32,16 +38,11 @@ authmiddlewear = (req, res, next) => {
     })
 }
 
-
-
-adminuser = "mvfawazmfz@gmail.com"
-
-
-admincheck = (req,res,next)=>{
-    if(adminuser===usermail){
+admincheck = (req, res, next) => {
+    if (adminuser === usermail) {
         admin = true
-        req.session.admin=true
-    }else{
+        req.session.admin = true
+    } else {
         admin = false
         req.session.admin = false
     }
@@ -54,8 +55,10 @@ admincheck = (req,res,next)=>{
 
 
 
-/*  home page. */
-router.get('/', admincheck,function (req, res, next) {
+/* --------- home page. ----------*/
+
+
+router.get('/', admincheck, function (req, res, next) {
     productHelpers.getProducts().then((products) => {
         if (req.session.log) {
             res.render('Userpage/user', { products, navbar: true, user, admin })
@@ -66,46 +69,57 @@ router.get('/', admincheck,function (req, res, next) {
 
 });
 
+
+///---------------logout-----------------//
+
 router.post('/', (req, res) => {
     req.session.destroy()
     res.redirect('/login')
 })
 
 
-router.post('/loggedin', authmiddlewear, (req, res) => {
-    res.redirect('/')
-})
-
-router.get('/signup', sessioncheck, function (req, res, next) {
-    res.render('signup',{signuppop});
-    signuppop = null
-});
-
-
-
-router.post('/signup', (req, res, next) => {
-    userHelpers.doSignup(req.body).then((response) => {
-        
-        if(response.loginStatus){
-            req.session.response = response
-            req.session.log = true
-            res.redirect('/')
-            signuppop = null
-        }else{
-            signuppop = response.response
-            
-            res.redirect('/signup')
-        }
-
-        
-    })
-})  
-
+//-----------------login-------------//
 
 router.get('/login', sessioncheck, function (req, res) {
     res.render('login', { pop, popupstatus })
     popupstatus = false
 });
+
+router.post('/loggedin', authmiddlewear, (req, res) => {
+    res.redirect('/')
+})
+
+
+//----------------signup ------------------//
+
+router.get('/signup', sessioncheck, function (req, res, next) {
+    res.render('signup', { signuppop });
+    signuppop = null
+});
+
+
+router.post('/signup', (req, res, next) => {
+    userHelpers.doSignup(req.body).then((response) => {
+
+        if (response.loginStatus) {
+            req.session.response = response
+            req.session.log = true
+            usermail = req.body.email
+            user = req.body.name
+            res.redirect('/')
+            signuppop = null
+        } else {
+            signuppop = response.response
+
+            res.redirect('/signup')
+        }
+
+
+    })
+})
+
+
+
 
 
 

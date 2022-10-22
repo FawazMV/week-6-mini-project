@@ -2,18 +2,10 @@ var express = require('express');
 const productHelpers = require('../helpers/product-helpers');
 var router = express.Router();
 const producthelp = require('../helpers/product-helpers');
-const userHelpers = require('../helpers/user-helpers');
-
-cachemiddle =(req, res, next) => {
-  res.set(
-    "Cache-control",
-    "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0"
-  );
-  next();
-};
-
-
+const userHelpers = require('../helpers/user-helpers'); 
 let admin 
+
+
 admincheck = (req,res,next)=>{
   if(req.session.admin){
     next()
@@ -22,21 +14,24 @@ admincheck = (req,res,next)=>{
   }
 }
 
+//---admin home page-----//
 
-/* GET users listing. */
 router.get('/', admincheck, function(req, res, next) {
   productHelpers.getProducts().then((products)=>{
     
     res.render('admin/adminpage',{products})
   })
-  
+
 });
-router.get('/add-product', cachemiddle, admincheck,(req,res)=>{
+
+//---------add product------------//
+
+router.get('/add-product', admincheck,(req,res)=>{
   res.render('admin/add-product',{navbar:false})
 })
 
-router.post('/add-product', cachemiddle, admincheck,(req,res)=>{
-  producthelp.addProduct(req.body,(data)=>{
+router.post('/add-product', admincheck,(req,res)=>{
+  producthelp.addProduct(req.body).then((data)=>{
     let img = req.files.Image
     img.mv('./public/product-images/' + data+'.jpg',(err)=>{
       if(err)console.log('image not saved'+err);
@@ -47,12 +42,23 @@ router.post('/add-product', cachemiddle, admincheck,(req,res)=>{
 })
 
 
+///--------------delete----------------//
+
 router.get('/delete/:id', admincheck,(req,res)=>{
   let Id = req.params.id
   productHelpers.deleteproduct(Id).then(()=>{
     res.redirect('/admin')
   })
 })
+
+router.get('/delete-user/:id', admincheck, (req, res) => {
+  let Id = req.params.id
+  userHelpers.deleteUser(Id).then(() => {
+    res.redirect('/admin/user-list')
+  })
+})
+
+//-----------------edit-----------//
 
 router.get('/edit/:id', admincheck,async (req, res) => {
   let Id = req.params.id
@@ -74,6 +80,8 @@ router.post('/edit-product/:id', admincheck,(req,res)=>{
 })
 
 
+//-----------------user details------------------//
+
 router.get('/user-list', admincheck,(req, res) => {
   
   userHelpers.getUsers().then((users) => {
@@ -84,13 +92,6 @@ router.get('/user-list', admincheck,(req, res) => {
 })
 
 
-router.get('/delete-user/:id', admincheck, (req, res) => {
-  let Id = req.params.id
-  userHelpers.deleteUser(Id).then(() => {
-    res.redirect('/admin/user-list')
-  })
-})
-
 router.post('/user-search', admincheck, (req, res) => {
   userHelpers.userSearch(req.body.searchkey).then((users)=>{
     res.render('admin/user-list', { users, navbar: false ,search:true})
@@ -98,31 +99,7 @@ router.post('/user-search', admincheck, (req, res) => {
   })
 })
 
-// userHelpers.getUsers().then((users) => {
 
-//   res.render('admin/user-list', { users, navbar: false })
-
-// })
-// })
-
-
-// router.post('/signup', (req, res, next) => {
-//   userHelpers.doSignup(req.body).then((response) => {
-
-//     if (response.loginStatus) {
-//       req.session.response = response
-//       req.session.log = true
-//       res.redirect('/')
-//       signuppop = null
-//     } else {
-//       signuppop = response.response
-
-//       res.redirect('/signup')
-//     }
-
-
-//   })
-// })
 
   
 

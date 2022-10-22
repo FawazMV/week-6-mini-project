@@ -1,17 +1,14 @@
-var createError = require('http-errors');
-var express = require('express');
+const createError = require('http-errors');
+const express = require('express');
 const session = require('express-session')
-var path = require('path');
-// var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var hbs = require('express-handlebars')
-var signupRouter = require('./routes/signup');
-var adminRouter = require('./routes/admin');
-var loginRouter = require('./routes/login');
+const path = require('path');
+const logger = require('morgan');
+const hbs = require('express-handlebars')
+const adminRouter = require('./routes/admin');
 const userRouter = require('./routes/user')
 const fileUpload = require('express-fileupload')
 const db = require('./config/connection')
-var app = express();
+const app = express();
 
 app.use(session({
   secret: 'key',
@@ -46,13 +43,10 @@ app.use(fileUpload())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', userRouter);
-app.use('/signup', signupRouter);
 app.use('/admin', adminRouter);
-app.use('/login', loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

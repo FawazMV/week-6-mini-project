@@ -2,13 +2,16 @@ const db = require('../config/connection')
 const objectId = require('mongodb').ObjectId
 module.exports = {
 
-    addProduct: (product, callback) => {
-    
-        db.get().collection('Products').insertOne(product).then((data) => {
-            callback(data.insertedId)
-            
+    addProduct:(product)=>{
+        return new Promise ((resolve,reject)=>{
+            db.get().collection('Products').insertOne(product).then(data=>{
+                resolve(data.insertedId)
+            })
         })
-    },
+    }
+
+
+    ,
 
     getProducts: ()=>{
         return new Promise(async(resolve,reject)=>{
