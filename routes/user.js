@@ -1,17 +1,9 @@
-const { response } = require('express');
-var express = require('express');
-
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const productHelpers = require('../helpers/product-helpers')
 const userHelpers = require('../helpers/user-helpers')
-let pop = {}
+let pop = {} ;
 let popupstatus, user, admin, usermail, signuppop
-
-
-adminuser = "mvfawazmfz@gmail.com"
-
-
-//-----------middlewears-------//
 
 sessioncheck = (req, res, next) => {
     if (req.session.log) {
@@ -38,27 +30,13 @@ authmiddlewear = (req, res, next) => {
     })
 }
 
-admincheck = (req, res, next) => {
-    if (adminuser === usermail) {
-        admin = true
-        req.session.admin = true
-    } else {
-        admin = false
-        req.session.admin = false
-    }
-    next()
-}
-
-
-
-
 
 
 
 /* --------- home page. ----------*/
 
 
-router.get('/', admincheck, function (req, res, next) {
+router.get('/', function (req, res, next) {
     productHelpers.getProducts().then((products) => {
         if (req.session.log) {
             res.render('Userpage/user', { products, navbar: true, user, admin })
@@ -117,12 +95,5 @@ router.post('/signup', (req, res, next) => {
 
     })
 })
-
-
-
-
-
-
-
 
 module.exports = router

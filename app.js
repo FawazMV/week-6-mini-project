@@ -8,7 +8,7 @@ const adminRouter = require('./routes/admin');
 const userRouter = require('./routes/user')
 const fileUpload = require('express-fileupload')
 const db = require('./config/connection')
-const app = express();
+const app = express();``
 
 app.use(session({
   secret: 'key',
